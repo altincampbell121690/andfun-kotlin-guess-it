@@ -18,7 +18,6 @@ package com.example.android.guesstheword.screens.game
 
 import android.os.Bundle
 import android.util.Log
-import android.util.Log.INFO
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,18 +27,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
-import timber.log.Timber
 
 /**
  * Fragment where the game is played
  */
 class GameFragment : Fragment() {
-    private lateinit var gameViewModel: GameViewModel
 
-
-    // The list of words - the front of the list is the next word to guess
-
-
+    private lateinit var viewModel: GameViewModel
     private lateinit var binding: GameFragmentBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -53,56 +47,48 @@ class GameFragment : Fragment() {
                 false
         )
 
-        // TODO (04) Create and initialize a GameViewModel, using ViewModelProvider; Add a log
-        // it takes in the owner of the viewModel which is the gragment
-        Timber.i("Called viewModelProviders!!!")
-        gameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
-        // statement
+        // Get the viewmodel
+        Log.i("GameFragment", "Called ViewModelProvider")
+        viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
-        resetList()
-        nextWord()
-
-        binding.correctButton.setOnClickListener { gameViewModel.onCorrect() }
-        binding.skipButton.setOnClickListener { gameViewModel.onSkip() }
+        // TODO (04) Update these onClickListeners to refer to call methods in the ViewModel then
+        // update the UI
+        binding.correctButton.setOnClickListener {
+            viewModel.onCorrect()
+            updateScoreText()
+            updateWordText()
+        }
+        binding.skipButton.setOnClickListener {
+            viewModel.onSkip()
+            updateScoreText()
+            updateWordText()
+        }
         updateScoreText()
         updateWordText()
         return binding.root
 
     }
 
-    private fun resetList() {
-        gameViewModel.resetList()
-    }
-
+    // TODO (02) Move over methods resetList, nextWord, onSkip and onCorrect to the GameViewModel
 
     /**
      * Called when the game is finished
      */
     private fun gameFinished() {
-        val action = GameFragmentDirections.actionGameToScore(gameViewModel.score)
+        val action = GameFragmentDirections.actionGameToScore(viewModel.score)
         findNavController(this).navigate(action)
     }
 
-    /**
-     * Moves to the next word in the list
-     */
-    private fun nextWord() {
-        //Select and remove a word from the list
-        if (gameViewModel.nextWord()) {
-            updateWordText()
-            updateScoreText()
-        } else {
-            gameFinished()
-        }
 
-    }
+    /** Methods for updating the UI **/
 
+    // TODO (05) Update these methods to get word and score from the viewmodel
     private fun updateWordText() {
-        binding.wordText.text = gameViewModel.word
+        binding.wordText.text = viewModel.word
 
     }
 
     private fun updateScoreText() {
-        binding.scoreText.text = gameViewModel.score.toString()
+        binding.scoreText.text = viewModel.score.toString()
     }
 }

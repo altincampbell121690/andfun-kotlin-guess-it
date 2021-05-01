@@ -33,6 +33,8 @@ class GameViewModel : ViewModel() {
     // TODO (03) Add init and override onCleared; Add log statements to both
     init {
         Timber.i("GameViewModel Created!!")
+        resetList()
+        nextWord()
     }
 
     // view models get cleared right before the fragment/activity it is associated with is completely destroyed
@@ -72,12 +74,10 @@ class GameViewModel : ViewModel() {
         wordList.shuffle()
     }
 
-    fun nextWord(): Boolean {
-        return if (wordList.isEmpty()) {
-            false
+    fun nextWord(){
+        if (wordList.isEmpty()) {
         } else {
             word = wordList.removeAt(0)
-            true
         }
     }
 
