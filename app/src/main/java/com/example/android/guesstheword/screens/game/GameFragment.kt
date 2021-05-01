@@ -17,20 +17,24 @@
 package com.example.android.guesstheword.screens.game
 
 import android.os.Bundle
+import android.util.Log
+import android.util.Log.INFO
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
+import timber.log.Timber
 
 /**
  * Fragment where the game is played
  */
 class GameFragment : Fragment() {
-
+    private lateinit var gameViewModel: GameViewModel
     // The current word
     private var word = ""
 
@@ -54,6 +58,9 @@ class GameFragment : Fragment() {
         )
 
         // TODO (04) Create and initialize a GameViewModel, using ViewModelProvider; Add a log
+        // it takes in the owner of the viewModel which is the gragment
+        Timber.i("Called viewModelProviders!!!")
+        gameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
         // statement
 
         resetList()

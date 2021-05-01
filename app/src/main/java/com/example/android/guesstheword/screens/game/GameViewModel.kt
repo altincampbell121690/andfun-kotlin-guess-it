@@ -16,5 +16,21 @@
 
 package com.example.android.guesstheword.screens.game
 
+import androidx.lifecycle.ViewModel
+import timber.log.Timber
 // TODO (02) Create the GameViewModel class, extending ViewModel
-// TODO (03) Add init and override onCleared; Add log statements to both
+class GameViewModel : ViewModel(){
+    // TODO (03) Add init and override onCleared; Add log statements to both
+    init {
+        Timber.i("GameViewModel Created!!")
+    }
+// view models get cleared right before the fragment/activity it is associated with is completely destroyed
+    override fun onCleared() {
+        super.onCleared()
+        Timber.i("GamViewModel has ben destroyed!!")
+    }
+
+
+
+}
+
