@@ -16,16 +16,28 @@
 
 package com.example.android.guesstheword.screens.game
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import timber.log.Timber
 
 // TODO (02) Create the GameViewModel class, extending ViewModel
 class GameViewModel : ViewModel() {
     // The current word
-    var word = ""
+    private val _word = MutableLiveData<String>()
+    val word : LiveData<String>
+        get() = _word
 
     // The current score
-    var score = 0
+    private val _score = MutableLiveData<Int>()
+    val score : LiveData<Int>
+        get() = _score
+
+    //gameStatus
+    private val _eventGameFinish = MutableLiveData<Boolean>()
+    val eventGameFinish : LiveData<Boolean>
+        get() = _eventGameFinish
+    
 
     //list of gamewords
     private lateinit var wordList: MutableList<String>
@@ -35,6 +47,8 @@ class GameViewModel : ViewModel() {
         Timber.i("GameViewModel Created!!")
         resetList()
         nextWord()
+        _score.value = 0
+        _eventGameFinish.value = false
     }
 
     // view models get cleared right before the fragment/activity it is associated with is completely destroyed
@@ -76,24 +90,27 @@ class GameViewModel : ViewModel() {
 
     fun nextWord(){
         if (wordList.isEmpty()) {
+            _eventGameFinish.value = true
         } else {
-            word = wordList.removeAt(0)
+            _word.value = wordList.removeAt(0)
         }
     }
 
     /** Methods for buttons presses **/
 
     fun onSkip() {
-        score--
+        _score.value= (score.value)?.minus(1)
         nextWord()
     }
 
     fun onCorrect() {
-        score++
+        (score.value)?.plus(1)
         nextWord()
     }
 
-
+fun onGameFinishedComplete(){
+    _eventGameFinish.value = false
+}
 
 
 }

@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.example.android.guesstheword.R
@@ -55,16 +56,27 @@ class GameFragment : Fragment() {
         // update the UI
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
-            updateScoreText()
-            updateWordText()
         }
         binding.skipButton.setOnClickListener {
             viewModel.onSkip()
-            updateScoreText()
-            updateWordText()
         }
-        updateScoreText()
-        updateWordText()
+        // TODO (0x) Set up Oberservation Connection
+// needs two things for live data observer, owner and an Observer Object
+        viewModel.score.observe(
+                this.viewLifecycleOwner,
+                Observer { newScore ->
+                    binding.scoreText.text = newScore.toString()
+                })
+        viewModel.word.observe(this.viewLifecycleOwner, Observer { newWord ->
+            binding.wordText.text = newWord
+        })
+
+        viewModel.eventGameFinish.observe(this.viewLifecycleOwner, Observer { hasFinished ->
+            if (hasFinished) {
+                gameFinished()
+                viewModel.onGameFinishedComplete()
+            }
+        })
         return binding.root
 
     }
@@ -75,7 +87,7 @@ class GameFragment : Fragment() {
      * Called when the game is finished
      */
     private fun gameFinished() {
-        val action = GameFragmentDirections.actionGameToScore(viewModel.score)
+        val action = GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0)
         findNavController(this).navigate(action)
     }
 
@@ -83,12 +95,6 @@ class GameFragment : Fragment() {
     /** Methods for updating the UI **/
 
     // TODO (05) Update these methods to get word and score from the viewmodel
-    private fun updateWordText() {
-        binding.wordText.text = viewModel.word
 
-    }
 
-    private fun updateScoreText() {
-        binding.scoreText.text = viewModel.score.toString()
-    }
 }
