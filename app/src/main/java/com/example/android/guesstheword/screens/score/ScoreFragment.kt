@@ -45,7 +45,6 @@ class ScoreFragment : Fragment() {
                 container,
                 false
         )
-
         // Get args using by navArgs property delegate
         val scoreFragmentArgs by navArgs<ScoreFragmentArgs>()
         binding.scoreText.text = scoreFragmentArgs.score.toString()

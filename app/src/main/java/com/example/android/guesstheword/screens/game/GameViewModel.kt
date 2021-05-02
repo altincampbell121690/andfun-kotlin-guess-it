@@ -16,6 +16,8 @@
 
 package com.example.android.guesstheword.screens.game
 
+import android.os.CountDownTimer
+import android.text.format.DateUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +25,16 @@ import timber.log.Timber
 
 // TODO (02) Create the GameViewModel class, extending ViewModel
 class GameViewModel : ViewModel() {
+    companion object {
+        // These represent different important times
+        // This is when the game is over
+        const val DONE = 0L
+        // This is the number of milliseconds in a second
+        const val ONE_SECOND = 1000L
+        // This is the total time of the game
+        const val COUNTDOWN_TIME = 10000L
+    }
+
     // The current word
     private val _word = MutableLiveData<String>()
     val word : LiveData<String>
@@ -37,7 +49,13 @@ class GameViewModel : ViewModel() {
     private val _eventGameFinish = MutableLiveData<Boolean>()
     val eventGameFinish : LiveData<Boolean>
         get() = _eventGameFinish
-    
+
+
+    private val _currentTime = MutableLiveData<String>()
+    val currentTime : LiveData<String>
+        get() = _currentTime
+
+    private val timer:CountDownTimer
 
     //list of gamewords
     private lateinit var wordList: MutableList<String>
@@ -47,14 +65,32 @@ class GameViewModel : ViewModel() {
         Timber.i("GameViewModel Created!!")
         resetList()
         nextWord()
+        _currentTime.value = DateUtils.formatElapsedTime(COUNTDOWN_TIME)
         _score.value = 0
         _eventGameFinish.value = false
+        _currentTime.value = "0"
+
+        timer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND){
+            override fun onTick(timeLeft: Long) {
+                _currentTime.value = DateUtils.formatElapsedTime(timeLeft/ ONE_SECOND)
+            }
+
+            override fun onFinish() {
+                _currentTime.value = DateUtils.formatElapsedTime(DONE)
+                _eventGameFinish.value = true
+            }
+
+        }
+        timer.start()
+       // DateUtils.formatElapsedTime()
+
     }
 
     // view models get cleared right before the fragment/activity it is associated with is completely destroyed
     override fun onCleared() {
         super.onCleared()
         Timber.i("GamViewModel has ben destroyed!!")
+        timer.cancel()
     }
 
     /**
@@ -90,10 +126,9 @@ class GameViewModel : ViewModel() {
 
     fun nextWord(){
         if (wordList.isEmpty()) {
-            _eventGameFinish.value = true
-        } else {
-            _word.value = wordList.removeAt(0)
+            resetList()
         }
+            _word.value = wordList.removeAt(0)
     }
 
     /** Methods for buttons presses **/
@@ -104,7 +139,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun onCorrect() {
-        (score.value)?.plus(1)
+        _score.value= (score.value)?.plus(1)
         nextWord()
     }
 
