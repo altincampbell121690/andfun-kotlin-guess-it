@@ -61,12 +61,17 @@ class ScoreFragment : Fragment() {
          * to use this factory to create ScoreViewModel.
          * */
         viewModel = ViewModelProvider(this,viewModelFactory).get(ScoreViewModel::class.java)
+        binding.scoreViewModel = viewModel
+        binding.lifecycleOwner = this
 
         binding.playAgainButton.setOnClickListener { onPlayAgain() }
 
-        viewModel.score.observe(this.viewLifecycleOwner, Observer {
-            gameScore -> binding.scoreText.text = gameScore.toString()
-        })
+       /****
+        * THIS IS NO LONGER NEEDED IF DIRECTLY BINDING THROUGH XML
+        * viewModel.score.observe(this.viewLifecycleOwner, Observer {
+        *   gameScore -> binding.scoreText.text = gameScore.toString()
+        * })
+        ****/
 
         return binding.root
     }

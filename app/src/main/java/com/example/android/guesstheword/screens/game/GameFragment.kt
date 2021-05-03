@@ -53,7 +53,7 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
         //set viewModel for xml binding
         binding.gameViewModel = viewModel
-
+        binding.lifecycleOwner = this // using this i have linked the view model directly to the view
         // TODO (04) Update these onClickListeners to refer to call methods in the ViewModel then
     /***
      * NOTE: we no longer need to set onclick listeners in the fragmentUI if we use xml binding
@@ -68,15 +68,18 @@ class GameFragment : Fragment() {
      ***/
         // TODO (0x) Set up Oberservation Connection
 // needs two things for live data observer, owner and an Observer Object
-        viewModel.score.observe(
-                this.viewLifecycleOwner,
-                Observer { newScore ->
-                    binding.scoreText.text = newScore.toString()
-                })
-        viewModel.word.observe(this.viewLifecycleOwner, Observer { newWord ->
-            binding.wordText.text = newWord
-        })
+    /*****
+     * NOTE: WE no longer need this if set binding lifecylce owner - view will be auto updated
+      *  viewModel.score.observe(
+       *         this.viewLifecycleOwner,
+        *        Observer { newScore ->
+         *           binding.scoreText.text = newScore.toString()
+          *      })
 
+      *viewModel.word.observe(this.viewLifecycleOwner, Observer { newWord ->
+       *     binding.wordText.text = newWord
+        *})
+*/
         viewModel.eventGameFinish.observe(this.viewLifecycleOwner, Observer { hasFinished ->
             if (hasFinished) {
                 gameFinished()
@@ -84,9 +87,9 @@ class GameFragment : Fragment() {
             }
         })
 
-        viewModel.currentTime.observe(this.viewLifecycleOwner, Observer { timeLeft ->
+        /*viewModel.currentTime.observe(this.viewLifecycleOwner, Observer { timeLeft ->
             binding.timerText.text = timeLeft
-        })
+        })*/
         return binding.root
 
     }
