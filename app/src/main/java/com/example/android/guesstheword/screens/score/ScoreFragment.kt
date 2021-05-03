@@ -22,6 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.guesstheword.R
@@ -32,11 +34,14 @@ import com.example.android.guesstheword.databinding.ScoreFragmentBinding
  */
 class ScoreFragment : Fragment() {
 
+    private lateinit var viewModel: ScoreViewModel
+    private lateinit var viewModelFactory: ScoreViewModelFactory
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
+
 
         // Inflate view and obtain an instance of the binding class.
         val binding: ScoreFragmentBinding = DataBindingUtil.inflate(
@@ -47,8 +52,19 @@ class ScoreFragment : Fragment() {
         )
         // Get args using by navArgs property delegate
         val scoreFragmentArgs by navArgs<ScoreFragmentArgs>()
-        binding.scoreText.text = scoreFragmentArgs.score.toString()
+        viewModelFactory = ScoreViewModelFactory(scoreFragmentArgs.score)
+        /***
+         * Create ScoreViewModel by using ViewModelProvider() as usual,
+         * except you’ll also pass in your ScoreViewModelFactory.
+         * NOTE:
+         * By passing in the ViewModel factory, you're telling ViewModelProvider
+         * to use this factory to create ScoreViewModel.
+         * */
+        viewModel = ViewModelProvider(this,viewModelFactory).get(ScoreViewModel::class.java)
         binding.playAgainButton.setOnClickListener { onPlayAgain() }
+        viewModel.score.observe(this.viewLifecycleOwner, Observer {
+            gameScore -> binding.scoreText.text = gameScore.toString()
+        })
 
         return binding.root
     }
