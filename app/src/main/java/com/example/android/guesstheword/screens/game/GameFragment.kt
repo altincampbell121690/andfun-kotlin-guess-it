@@ -51,8 +51,12 @@ class GameFragment : Fragment() {
         // Get the viewmodel
         Log.i("GameFragment", "Called ViewModelProvider")
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+        //set viewModel for xml binding
+        binding.gameViewModel = viewModel
 
         // TODO (04) Update these onClickListeners to refer to call methods in the ViewModel then
+    /***
+     * NOTE: we no longer need to set onclick listeners in the fragmentUI if we use xml binding
         // update the UI
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
@@ -60,6 +64,8 @@ class GameFragment : Fragment() {
         binding.skipButton.setOnClickListener {
             viewModel.onSkip()
         }
+
+     ***/
         // TODO (0x) Set up Oberservation Connection
 // needs two things for live data observer, owner and an Observer Object
         viewModel.score.observe(
