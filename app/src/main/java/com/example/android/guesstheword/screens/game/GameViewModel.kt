@@ -18,11 +18,17 @@ package com.example.android.guesstheword.screens.game
 
 import android.os.CountDownTimer
 import android.text.format.DateUtils
+import android.view.inputmethod.CorrectionInfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import timber.log.Timber
+
+private val CORRECT_BUZZ_PATTERN = longArrayOf(100, 100, 100, 100, 100, 100)
+private val PANIC_BUZZ_PATTERN = longArrayOf(0, 200)
+private val GAME_OVER_BUZZ_PATTERN = longArrayOf(0, 2000)
+private val NO_BUZZ_PATTERN = longArrayOf(0)
 
 // TODO (02) Create the GameViewModel class, extending ViewModel
 class GameViewModel : ViewModel() {
@@ -34,14 +40,28 @@ class GameViewModel : ViewModel() {
         // This is the number of milliseconds in a second
         const val ONE_SECOND = 1000L
 
+        // This is the number of milliseconds in a second
+        const val COUNTDOWN_PANIC = 10000L
+
         // This is the total time of the game
-        const val COUNTDOWN_TIME = 10000L
+        const val COUNTDOWN_TIME = 20000L
+    }
+
+    enum class BuzzType(val pattern: LongArray){
+        CORRECT(CORRECT_BUZZ_PATTERN),
+        GAME_OVER(GAME_OVER_BUZZ_PATTERN),
+        COUNTDOWN_PANIC(PANIC_BUZZ_PATTERN),
+        NO_BUZZ(NO_BUZZ_PATTERN)
     }
 
     // The current word
     private val _word = MutableLiveData<String>()
     val word: LiveData<String>
         get() = _word
+
+    private val _buzzPattern = MutableLiveData<BuzzType>()
+    val buzzPattern:LiveData<BuzzType>
+        get() = _buzzPattern
 
     // The current score
     private val _score = MutableLiveData<Int>()
@@ -80,9 +100,14 @@ class GameViewModel : ViewModel() {
         timer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND) {
             override fun onTick(timeLeft: Long) {
                 _currentTime.value = timeLeft / ONE_SECOND
+                currentTime.value?.let { time ->
+                    if(time <= 10L )  _buzzPattern.value = BuzzType.COUNTDOWN_PANIC
+                }
+
             }
 
             override fun onFinish() {
+                _buzzPattern.value = BuzzType.GAME_OVER
                 _currentTime.value = DONE
                 _eventGameFinish.value = true
             }
@@ -136,6 +161,7 @@ class GameViewModel : ViewModel() {
             resetList()
         }
         _word.value = wordList.removeAt(0)
+
     }
 
     /** Methods for buttons presses **/
@@ -148,6 +174,7 @@ class GameViewModel : ViewModel() {
     fun onCorrect() {
         _score.value = (score.value)?.plus(1)
         nextWord()
+        _buzzPattern.value = BuzzType.CORRECT
     }
 
     fun onGameFinishedComplete() {
