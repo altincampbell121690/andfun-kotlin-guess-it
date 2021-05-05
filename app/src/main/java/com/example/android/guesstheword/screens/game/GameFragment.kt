@@ -91,8 +91,11 @@ class GameFragment : Fragment() {
             }
         })
 
-        viewModel.buzzPattern.observe(this.viewLifecycleOwner, Observer { buzz ->
-            buzz(pattern = buzz.pattern)
+        viewModel.buzzPattern.observe(this.viewLifecycleOwner, Observer { buzzType ->
+            if (buzzType != GameViewModel.BuzzType.NO_BUZZ) {
+                buzz(buzzType.pattern)
+                viewModel.onBuzzComplete()
+            }
         })
         /*viewModel.currentTime.observe(this.viewLifecycleOwner, Observer { timeLeft ->
             binding.timerText.text = timeLeft

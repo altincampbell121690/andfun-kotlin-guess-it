@@ -181,6 +181,10 @@ class GameViewModel : ViewModel() {
         _eventGameFinish.value = false
     }
 
+    fun onBuzzComplete() {
+        _buzzPattern.value = BuzzType.NO_BUZZ
+    }
+
 
 }
 
